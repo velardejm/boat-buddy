@@ -16,11 +16,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
+const formSchema = z
+  .object({
+    username: z.string().min(2, {
+      message: "Username must be at least 2 characters.",
+    }),
+    password: z.string(),
+    confirm: z.string(),
+  })
+  .refine((data) => data.password === data.confirm, {
+    message: "Passwords don't match",
+    path: ["confirm"], // path of error
+  });
 
 export default function SignupForm() {
   // 1. Define your form.
@@ -42,16 +49,17 @@ export default function SignupForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 w-1/2 bg-blue-300 flex flex-col justify-center items-center h-1/2"
+        className="space-y-8 w-1/2 md:w-1/4 flex flex-col  items-center h-1/2"
       >
+        <h1 className="w-full text-3xl font-bold relative -left-4">Sign Up</h1>
         <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
+            <FormItem className="w-full">
+              {/* <FormLabel>Username</FormLabel> */}
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Username" {...field} />
               </FormControl>
               <FormDescription>
                 This is your public display name.
@@ -60,6 +68,39 @@ export default function SignupForm() {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              {/* <FormLabel>Password</FormLabel> */}
+              <FormControl>
+                <Input placeholder="Password" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="confirm"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              {/* <FormLabel>Confirm Password</FormLabel> */}
+              <FormControl>
+                <Input
+                  placeholder="Confirm password"
+                  type="password"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit">Submit</Button>
       </form>
     </Form>
