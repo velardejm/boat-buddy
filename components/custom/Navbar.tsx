@@ -14,7 +14,15 @@ import {
 export default function Navbar() {
   return (
     <NavigationMenu className="min-w-full flex justify-between p-4">
-      <NavigationMenuList></NavigationMenuList>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <Link href="/test-page" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Test Page
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+      </NavigationMenuList>
       <NavigationMenuList>
         <NavigationMenuItem>
           <Link href="/login" legacyBehavior passHref>
