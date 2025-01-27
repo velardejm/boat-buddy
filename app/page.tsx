@@ -7,7 +7,7 @@ export default function Page() {
     <>
       <div>
         {/* <Navbar /> */}
-        <div className="flex justify-center items-center h-dvh">
+        <div className="flex justify-center items-center h-[80dvh]">
           <SignupForm />
           {/* <LoginForm /> */}
         </div>
