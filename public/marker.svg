@@ -1,0 +1,6 @@
+   <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" viewBox="0 0 40 50">
+        <!-- Pin Shape -->
+        <path d="M20 0C12.268 0 6 6.268 6 14C6 19.568 9.638 25.466 14 31C14 33.838 12 37 12 39H28C28 37 26 33.838 26 31C30.362 25.466 34 19.568 34 14C34 6.268 27.732 0 20 0Z" fill="#FF5733" />
+        <!-- Circle in the middle -->
+        <circle cx="20" cy="14" r="6" fill="white" stroke="#FF5733" stroke-width="3" />
+      </svg>
