@@ -1,4 +1,4 @@
-import CreateTrip from "@/components/custom/CreateTrip";
+// import CreateTrip from "@/components/custom/CreateTrip";
 import TripDetails from "@/components/custom/TripDetails";
 // import CommentsList from "@/components/custom/CommentsLists";
 

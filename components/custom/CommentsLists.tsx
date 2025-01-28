@@ -3,9 +3,11 @@
  * @see https://v0.dev/t/GlIgT4wHfb5
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+interface ListOrderedIconProps extends React.SVGProps<SVGSVGElement> {}
 
 export default function CommentsList() {
   return (
@@ -32,8 +34,9 @@ export default function CommentsList() {
               <div className="text-xs text-muted-foreground">2 days ago</div>
             </div>
             <div className="text-sm leading-relaxed text-muted-foreground">
-              Wow, this is an amazing product! I've been using it for a week now and it's been a game-changer. The setup
-              was super easy and the features are incredibly useful. Highly recommend!
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+              dictum, arcu in blandit luctus, lorem neque dignissim diam, non
+              suscipit tortor ligula lacinia lacus.
             </div>
           </div>
         </div>
@@ -48,8 +51,9 @@ export default function CommentsList() {
               <div className="text-xs text-muted-foreground">1 week ago</div>
             </div>
             <div className="text-sm leading-relaxed text-muted-foreground">
-              I've been using this product for a few months now and it's been fantastic. The customer support has also
-              been incredibly responsive and helpful. Highly recommend!
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+              dictum, arcu in blandit luctus, lorem neque dignissim diam, non
+              suscipit tortor ligula lacinia lacus.
             </div>
           </div>
         </div>
@@ -64,8 +68,9 @@ export default function CommentsList() {
               <div className="text-xs text-muted-foreground">3 weeks ago</div>
             </div>
             <div className="text-sm leading-relaxed text-muted-foreground">
-              I was a bit hesitant to try this product at first, but I'm so glad I did. It's been a game-changer for my
-              business. The features are incredibly useful and the user interface is intuitive. Highly recommend!
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+              dictum, arcu in blandit luctus, lorem neque dignissim diam, non
+              suscipit tortor ligula lacinia lacus.
             </div>
           </div>
         </div>
@@ -80,17 +85,18 @@ export default function CommentsList() {
               <div className="text-xs text-muted-foreground">1 month ago</div>
             </div>
             <div className="text-sm leading-relaxed text-muted-foreground">
-              I've been using this product for a while now and it's been a game-changer for my workflow. The automation
-              features are incredibly useful and have saved me so much time. Highly recommend!
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+              dictum, arcu in blandit luctus, lorem neque dignissim diam, non
+              suscipit tortor ligula lacinia lacus.
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-function ListOrderedIcon(props:any) {
+const ListOrderedIcon: React.FC<ListOrderedIconProps> = (props) => {
   return (
     <svg
       {...props}
@@ -111,5 +117,5 @@ function ListOrderedIcon(props:any) {
       <path d="M4 10h2" />
       <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
     </svg>
-  )
-}
+  );
+};
