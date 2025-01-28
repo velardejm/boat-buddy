@@ -7,8 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-interface ListOrderedIconProps extends React.SVGProps<SVGSVGElement> {}
-
 export default function CommentsList() {
   return (
     <div className="mx-auto px-4 md:px-6 max-w-2xl grid gap-8">
@@ -96,10 +94,10 @@ export default function CommentsList() {
   );
 }
 
-const ListOrderedIcon: React.FC<ListOrderedIconProps> = (props) => {
+function ListOrderedIcon({ className }: { className: string }) {
   return (
     <svg
-      {...props}
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
@@ -118,4 +116,4 @@ const ListOrderedIcon: React.FC<ListOrderedIconProps> = (props) => {
       <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
     </svg>
   );
-};
+}
