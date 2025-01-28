@@ -39,7 +39,7 @@ const formSchema = z
     message: "Invalid date",
   });
 
-export default function CreateTrip({ className }: { className?: string }) {
+export default function CreateTrip() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,7 +55,7 @@ export default function CreateTrip({ className }: { className?: string }) {
   }
 
   return (
-    <div className={`${className ? className : ""} flex justify-center`}>
+    <div className="flex justify-center">
       <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>Organize a Fishing Trip</CardTitle>
