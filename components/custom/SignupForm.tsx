@@ -29,12 +29,18 @@ const formSchema = z
     path: ["confirm"], // path of error
   });
 
-export default function SignupForm() {
+export default function SignupForm({
+  addUser,
+}: {
+  addUser: string | ((formData: FormData) => void | Promise<void>) | undefined;
+}) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
+      password: "",
+      confirm: "",
     },
   });
 
@@ -42,13 +48,14 @@ export default function SignupForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    console.log('test');
   }
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        // onSubmit={form.handleSubmit(onSubmit)}
+        action={addUser}
         className="space-y-8 w-1/2 md:w-1/4 flex flex-col  items-center h-1/2"
       >
         <h1 className="w-full text-3xl font-bold relative -left-4">Sign Up</h1>
