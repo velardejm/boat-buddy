@@ -4,6 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { useActionState } from "react";
+import { addUser } from "@/lib/data";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -29,11 +32,9 @@ const formSchema = z
     path: ["confirm"], // path of error
   });
 
-export default function SignupForm({
-  addUserAction,
-}: {
-  addUserAction: string | ((formData: FormData) => void | Promise<void>) | undefined;
-}) {
+export default function SignupForm() {
+  const [state, formAction] = useActionState(addUser, { message: "Hello!" });
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,14 +49,15 @@ export default function SignupForm({
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log('test');
+    console.log("test");
   }
 
   return (
     <Form {...form}>
+
       <form
         // onSubmit={form.handleSubmit(onSubmit)}
-        action={addUserAction}
+        action={formAction}
         className="space-y-8 w-1/2 md:w-1/4 flex flex-col  items-center h-1/2"
       >
         <h1 className="w-full text-3xl font-bold relative -left-4">Sign Up</h1>

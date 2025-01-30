@@ -1,10 +1,7 @@
 "use server";
 
-// import { db, sql } from "@vercel/postgres";
 import { sql } from "@vercel/postgres";
 import bcrypt from "bcrypt";
-
-// const client = await db.connect();
 
 export async function getUsers() {
   try {
@@ -18,24 +15,34 @@ export async function getUsers() {
   }
 }
 
-export async function addUser(formData: FormData) {
+export async function addUser2(
+  prevState: { message: string },
+  formData: FormData
+): Promise<{ message: string }> {
+  console.log(`Server says hello: ${formData.get("checkBox")}`);
+  // Do your stuff here
+  return { message: "Form submitted" }; // or some relevant message
+}
+
+export async function addUser(
+  prevState: { message: string },
+  formData: FormData
+): Promise<{ message: string }> {
   const username = formData.get("username") as string;
   const password = formData.get("password") as string;
-  console.log(typeof password);
   const hashedPassword = await bcrypt.hash(password, 10);
-  console.log("username: " + username);
-  console.log("password: " + hashedPassword);
   try {
-    // const data = await client.sql`
     const data = await sql`
       INSERT INTO users (username, password)
       VALUES (${username}, ${hashedPassword})
       RETURNING username
     `;
-    // console.log("========================");
+
     console.log(data);
+
     // return data; // Returning the username of the newly added user
   } catch (error) {
     console.log(error);
   }
+  return { message: "Test" };
 }
