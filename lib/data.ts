@@ -2,7 +2,7 @@
 
 // import { db, sql } from "@vercel/postgres";
 import { sql } from "@vercel/postgres";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 
 // const client = await db.connect();
 
@@ -19,7 +19,10 @@ export async function getUsers() {
 }
 
 export async function addUser(formData: FormData) {
-  console.log(...formData);
+  const username = formData.get("username");
+  const password = formData.get("password");
+  console.log("username: " + username);
+  console.log("password: " + password);
   try {
     // const hashedPassowrd = await bcrypt.hash(formData.password, 10);
     // const data = await client.sql`
@@ -28,7 +31,7 @@ export async function addUser(formData: FormData) {
     //   VALUES (${username}, ${password})
     //   RETURNING username
     // `;
-    console.log("========================");
+    // console.log("========================");
     // console.log(data);
     // return data; // Returning the username of the newly added user
   } catch (error) {

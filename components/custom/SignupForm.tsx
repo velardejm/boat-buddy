@@ -30,9 +30,9 @@ const formSchema = z
   });
 
 export default function SignupForm({
-  addUser,
+  addUserAction,
 }: {
-  addUser: string | ((formData: FormData) => void | Promise<void>) | undefined;
+  addUserAction: string | ((formData: FormData) => void | Promise<void>) | undefined;
 }) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,7 +55,7 @@ export default function SignupForm({
     <Form {...form}>
       <form
         // onSubmit={form.handleSubmit(onSubmit)}
-        action={addUser}
+        action={addUserAction}
         className="space-y-8 w-1/2 md:w-1/4 flex flex-col  items-center h-1/2"
       >
         <h1 className="w-full text-3xl font-bold relative -left-4">Sign Up</h1>
