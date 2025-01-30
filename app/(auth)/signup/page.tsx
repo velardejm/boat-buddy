@@ -21,7 +21,9 @@ const formSchema = z
     username: z.string().min(2, {
       message: "Username must be at least 2 characters.",
     }),
-    password: z.string(),
+    password: z.string().min(2, {
+      message: "Password must be at least 2 characters.",
+    }),
     confirm: z.string(),
   })
   .refine((data) => data.password === data.confirm, {
@@ -35,6 +37,8 @@ export default function Page() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
+      password: "",
+      confirm: "",
     },
   });
 
