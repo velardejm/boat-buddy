@@ -34,21 +34,43 @@ export async function addUser(
   const password = formData.get("password") as string;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  
-  try {
-    const data = await sql`
-      INSERT INTO users (username, password)
-      VALUES (${username}, ${hashedPassword})
-      RETURNING username
-    `;
-    
-    console.log(data);
-    return { message: "Ok" };
+  const formSchema = z
+    .object({
+      username: z.string().min(2, {
+        message: "Username must be at least 2 characters.",
+      }),
+      password: z.string(),
+      confirm: z.string(),
+    })
+    .refine((data) => data.password === data.confirm, {
+      message: "Passwords don't match",
+      path: ["confirm"], // path of error
+    });
 
-    // return data; // Returning the username of the newly added user
-  } catch (error) {
-    console.log(error);
-    return { message: "Error" };
+  const parse = formSchema.safeParse({
+    username: formData.get("username"),
+    password: formData.get("password"),
+    confirm: formData.get("confirm"),
+  });
+
+  console.log(parse);
+  if (parse.success) {
+    try {
+      const data = await sql`
+        INSERT INTO users (username, password)
+        VALUES (${username}, ${hashedPassword})
+        RETURNING username
+      `;
+
+      console.log(data);
+      return { message: "Ok" };
+
+      // return data; // Returning the username of the newly added user
+    } catch (error) {
+      console.log(error);
+      return { message: "Error" };
+    }
+  } else {
+    return { message: "Validation Error" };
   }
-
 }

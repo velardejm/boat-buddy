@@ -56,7 +56,7 @@ export default function SignupForm() {
     <Form {...form}>
       <h1>{state?.message}</h1>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        // onSubmit={form.handleSubmit(onSubmit)}
         action={formAction}
         className="space-y-8 w-1/2 md:w-1/4 flex flex-col  items-center h-1/2"
       >
