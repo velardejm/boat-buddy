@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { useActionState } from "react";
-import { addUser } from "@/lib/data";
+import { useActionState } from 'react';
+import { addUser } from '@/lib/data';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -16,41 +16,43 @@ import {
   FormItem,
   // FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 const formSchema = z
   .object({
     username: z.string().min(2, {
-      message: "Username must be at least 2 characters.",
+      message: 'Username must be at least 2 characters.',
     }),
-    password: z.string(),
+    password: z.string().min(2, {
+      message: 'Password must be at least 2 characters.',
+    }),
     confirm: z.string(),
   })
   .refine((data) => data.password === data.confirm, {
     message: "Passwords don't match",
-    path: ["confirm"], // path of error
+    path: ['confirm'], // path of error
   });
 
 export default function SignupForm() {
-  const [state, formAction] = useActionState(addUser, { message: "Hello!" });
+  const [state, formAction] = useActionState(addUser, { message: 'Hello!' });
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      password: "",
-      confirm: "",
+      username: '',
+      password: '',
+      confirm: '',
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  // function onSubmit(values: z.infer<typeof formSchema>) {
+  // Do something with the form values.
+  // ✅ This will be type-safe and validated.
+  // console.log(values);
+  // }
 
   return (
     <Form {...form}>
