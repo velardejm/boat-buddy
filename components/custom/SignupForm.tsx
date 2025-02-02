@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { useActionState } from 'react';
-import { addUser } from '@/lib/data';
+import { useActionState } from "react";
+import { addUser } from "@/lib/data";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -16,35 +16,41 @@ import {
   FormItem,
   // FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 const formSchema = z
   .object({
     username: z.string().min(2, {
-      message: 'Username must be at least 2 characters.',
+      message: "Username must be at least 2 characters.",
     }),
     password: z.string().min(2, {
-      message: 'Password must be at least 2 characters.',
+      message: "Password must be at least 2 characters.",
     }),
     confirm: z.string(),
   })
   .refine((data) => data.password === data.confirm, {
     message: "Passwords don't match",
-    path: ['confirm'], // path of error
+    path: ["confirm"], // path of error
   });
 
 export default function SignupForm() {
-  const [state, formAction] = useActionState(addUser, { message: 'Hello!' });
+  const [state, formAction] = useActionState(addUser, { message: "" });
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: '',
-      password: '',
-      confirm: '',
+      username: "",
+      password: "",
+      confirm: "",
     },
+  });
+
+  const parse = formSchema.safeParse({
+    username: form.getValues("username"),
+    password: form.getValues("password"),
+    confirm: form.getValues("confirm"),
   });
 
   // 2. Define a submit handler.
@@ -56,7 +62,6 @@ export default function SignupForm() {
 
   return (
     <Form {...form}>
-      <h1>{state?.message}</h1>
       <form
         // onSubmit={form.handleSubmit(onSubmit)}
         action={formAction}
@@ -67,7 +72,12 @@ export default function SignupForm() {
           control={form.control}
           name="username"
           render={({ field }) => (
-            <FormItem className="w-full">
+            <FormItem
+              className="w-full"
+              onChange={() => {
+                form.trigger("username");
+              }}
+            >
               {/* <FormLabel>Username</FormLabel> */}
               <FormControl>
                 <Input placeholder="Username" {...field} />
@@ -84,7 +94,12 @@ export default function SignupForm() {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem className="w-full">
+            <FormItem
+              className="w-full"
+              onChange={() => {
+                form.trigger("password");
+              }}
+            >
               {/* <FormLabel>Password</FormLabel> */}
               <FormControl>
                 <Input placeholder="Password" type="password" {...field} />
@@ -98,7 +113,12 @@ export default function SignupForm() {
           control={form.control}
           name="confirm"
           render={({ field }) => (
-            <FormItem className="w-full">
+            <FormItem
+              className="w-full"
+              onChange={() => {
+                form.trigger("confirm");
+              }}
+            >
               {/* <FormLabel>Confirm Password</FormLabel> */}
               <FormControl>
                 <Input
@@ -111,8 +131,12 @@ export default function SignupForm() {
             </FormItem>
           )}
         />
-
-        <Button type="submit">Submit</Button>
+        <div className="flex flex-col items-center">
+          <p className="text-[0.8rem] font-medium text-destructive mb-4">{state?.message}</p>
+          <Button type="submit" disabled={!parse.success} className="w-24">
+            Submit
+          </Button>
+        </div>
       </form>
     </Form>
   );

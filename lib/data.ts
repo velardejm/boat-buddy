@@ -87,13 +87,13 @@ export async function addUser(
       `;
 
     console.log(data);
-    return { message: 'Ok' };
+    return { message: 'Signup Succesful' };
 
     // return data; // Returning the username of the newly added user
   } catch (error) {
     // console.log(error);
     console.log(error);
-    return { message: 'Error' };
+    return { message: 'Username alrerady exists.' };
   }
   // } else {
   //   // console.log(parse.error);
