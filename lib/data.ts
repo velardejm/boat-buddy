@@ -1,9 +1,8 @@
-'use server';
+"use server";
 
-import { sql } from '@vercel/postgres';
-import bcrypt from 'bcrypt';
-
-import { z } from 'zod';
+import { sql } from "@vercel/postgres";
+import bcrypt from "bcrypt";
+import { redirect } from "next/navigation";
 
 export async function getUsers() {
   try {
@@ -17,86 +16,33 @@ export async function getUsers() {
   }
 }
 
-// export async function addUser2(
-//   prevState: { message: string },
-//   formData: FormData
-// ): Promise<{ message: string }> {
-//   console.log(`Server says hello: ${formData.get('checkBox')}`);
-//   // Do your stuff here
-//   return { message: 'Form submitted' }; // or some relevant message
-// }
-
 export async function addUser(
-  prevState: { message: string },
+  prevState: { message: string; success: boolean },
   formData: FormData
-): Promise<{ message: string }> {
-  const username = formData.get('username') as string;
-  const password = formData.get('password') as string;
-  const confirm = formData.get('confirm') as string;
-
-  const formSchema = z.object({
-    username: z
-      .string()
-      .min(2, {
-        message: 'Username must be at least 2 characters.',
-      })
-      .nonempty(),
-    password: z
-      .string()
-      .min(2, {
-        message: 'zzzzzzz',
-      })
-      .nonempty(),
-    confirm: z.string().nonempty(),
-  });
-  // .refine((data) => data.password === data.confirm, {
-  //   message: "Passwords don't match",
-  //   path: ['confirm'], // path of error
-  // });
-
-  try {
-    formSchema.parse({
-      username: username,
-      password: password,
-      confirm: confirm,
-    });
-  } catch (error) {
-    console.log('=======================');
-    if (error instanceof z.ZodError) {
-      console.log(error.issues);
-      return { message: error.issues[0].message };
-    }
-    console.log('=======================');
-  }
-
-  // const parse = formSchema.safeParse({
-  //   username: formData.get('username'),
-  //   password: formData.get('password'),
-  //   confirm: formData.get('confirm'),
-  // });
-
-  // console.log(parse);
-
-  // if (parse.success) {
+): Promise<{ message: string; success: boolean }> {
+  const username = formData.get("username") as string;
+  const password = formData.get("password") as string;
   const hashedPassword = await bcrypt.hash(password, 10);
+
   try {
+    const userExists = await sql`
+    SELECT 1 FROM users WHERE username = ${username} LIMIT 1
+    `;
+
+    if (userExists.rowCount === 1)
+      return { message: "Username alrerady exists.", success: false };
+
     const data = await sql`
         INSERT INTO users (username, password)
         VALUES (${username}, ${hashedPassword})
         RETURNING username
       `;
 
-    console.log(data);
-    return { message: 'Signup Succesful' };
-
-    // return data; // Returning the username of the newly added user
+    return { message: "Signup Successful", success: true };
   } catch (error) {
-    // console.log(error);
-    console.log(error);
-    return { message: 'Username alrerady exists.' };
+    return {
+      message: "Signup failed, please try again later.",
+      success: false,
+    };
   }
-  // } else {
-  //   // console.log(parse.error);
-  //   return { message: 'Validation Error' };
-  // }
 }

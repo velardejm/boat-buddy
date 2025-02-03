@@ -4,8 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { addUser } from "@/lib/data";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,12 +23,24 @@ import { Input } from "@/components/ui/input";
 
 const formSchema = z
   .object({
-    username: z.string().min(2, {
-      message: "Username must be at least 2 characters.",
-    }),
-    password: z.string().min(2, {
-      message: "Password must be at least 2 characters.",
-    }),
+    username: z
+      .string()
+      .min(2, {
+        message: "Username must be at least 2 characters.",
+      })
+      .regex(/^[a-zA-Z0-9]+$/, {
+        message:
+          "Only alphanumeric characters are allowed (no spaces or special characters)",
+      }),
+    password: z
+      .string()
+      .min(2, {
+        message: "Password must be at least 2 characters.",
+      })
+      .regex(/^[a-zA-Z0-9]+$/, {
+        message:
+          "Only alphanumeric characters are allowed (no spaces or special characters)",
+      }),
     confirm: z.string(),
   })
   .refine((data) => data.password === data.confirm, {
@@ -35,7 +49,18 @@ const formSchema = z
   });
 
 export default function SignupForm() {
-  const [state, formAction] = useActionState(addUser, { message: "" });
+  const router = useRouter();
+  const [state, formAction] = useActionState<
+    { message: string; success: boolean },
+    FormData
+  >(addUser, { message: "", success: false });
+
+  useEffect(() => {
+    if (state.success) {
+      // alert("Success state captured");
+      router.push("/login");
+    }
+  }, [state]);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -132,7 +157,14 @@ export default function SignupForm() {
           )}
         />
         <div className="flex flex-col items-center">
-          <p className="text-[0.8rem] font-medium text-destructive mb-4">{state?.message}</p>
+          <p
+            className={cn(
+              "text-[0.8rem] font-medium mb-4",
+              state?.success ? "text-green-500" : "text-destructive "
+            )}
+          >
+            {`${state?.message}`}
+          </p>
           <Button type="submit" disabled={!parse.success} className="w-24">
             Submit
           </Button>
