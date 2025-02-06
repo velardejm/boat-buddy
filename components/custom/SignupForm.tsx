@@ -50,7 +50,7 @@ const formSchema = z
 
 export default function SignupForm() {
   const router = useRouter();
-  const [state, formAction] = useActionState<
+  const [state, formAction, pending] = useActionState<
     { message: string; success: boolean },
     FormData
   >(addUser, { message: "", success: false });
@@ -165,8 +165,12 @@ export default function SignupForm() {
           >
             {`${state?.message}`}
           </p>
-          <Button type="submit" disabled={!parse.success} className="w-24">
-            Submit
+          <Button
+            type="submit"
+            disabled={!parse.success || pending}
+            className="w-24"
+          >
+            {!pending ? "Submit" : "Submitting..."}
           </Button>
         </div>
       </form>

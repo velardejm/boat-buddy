@@ -2,7 +2,7 @@
 
 import { sql } from "@vercel/postgres";
 import bcrypt from "bcrypt";
-import { redirect } from "next/navigation";
+import { createSession } from "./session";
 
 export async function getUsers() {
   try {
@@ -35,8 +35,10 @@ export async function addUser(
     const data = await sql`
         INSERT INTO users (username, password)
         VALUES (${username}, ${hashedPassword})
-        RETURNING username
+        RETURNING userId
       `;
+
+    await createSession(data.rows[0].userId);
 
     return { message: "Signup Successful", success: true };
   } catch (error) {
