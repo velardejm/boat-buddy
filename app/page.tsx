@@ -1,14 +1,15 @@
-import SignupForm from "@/components/custom/SignupForm";
-// import LoginForm from "@/components/custom/LoginForm";
-// import Navbar from "@/components/custom/Navbar";
+import LoginForm from "@/components/custom/LoginForm";
+import { checkSession } from "@/lib/session";
 
-export default function Page() {
+export default async function Page() {
+  const isSession = await checkSession();
+
   return (
     <>
       <div>
         {/* <Navbar /> */}
         <div className="flex justify-center items-center h-[80dvh]">
-          <SignupForm />
+          {isSession ? <p className="text-3xl">Welcome!</p> : <LoginForm />}
           {/* <LoginForm /> */}
         </div>
       </div>

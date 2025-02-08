@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+import { checkSession, deleteSession } from "@/lib/session";
 import {
   NavigationMenu,
   // NavigationMenuContent,
@@ -10,8 +11,10 @@ import {
   // NavigationMenuTrigger,
   // NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
+import LogoutButton from "./LogoutButton";
 
-export default function Navbar() {
+export default async function Navbar() {
+  const isSession = await checkSession();
   return (
     <NavigationMenu className="min-w-full flex justify-between p-4">
       <NavigationMenuList>
@@ -41,16 +44,27 @@ export default function Navbar() {
       </NavigationMenuList>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <Link href="/login" legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Log In
-            </NavigationMenuLink>
-          </Link>
-          <Link href="/signup" legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Sign Up
-            </NavigationMenuLink>
-          </Link>
+          {isSession ? (
+            // <Link href="" legacyBehavior passHref>
+            //   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+            //     Log Out
+            //   </NavigationMenuLink>
+            // </Link>
+            <LogoutButton deleteSession={deleteSession} />
+          ) : (
+            <>
+              <Link href="/login" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Log In
+                </NavigationMenuLink>
+              </Link>
+              <Link href="/signup" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Sign Up
+                </NavigationMenuLink>
+              </Link>
+            </>
+          )}
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
