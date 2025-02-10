@@ -5,7 +5,7 @@ export default async function Page() {
   const users = data?.rows;
   return (
     <div>
-      <ul>{users ? users.map((user) => <li>{user.username}</li>) : null}</ul>
+      <ul>{users ? users.map((user) => <li key={user.username}>{user.username}</li>) : null}</ul>
     </div>
   );
 }

@@ -11,9 +11,9 @@ export default async function Page() {
   //   };
 
   const isSession = await checkSession();
-  const logOut = async () => {
-    await deleteSession();
-  };
+  // const logOut = async () => {
+  //   await deleteSession();
+  // };
 
   return (
     <div>

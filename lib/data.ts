@@ -38,10 +38,13 @@ export async function addUser(
         RETURNING userId
       `;
 
+      console.log(data);
+
     // await createSession(data.rows[0].userId);
 
     return { message: "Signup Successful", success: true };
   } catch (error) {
+    console.log(error);
     return {
       message: "Signup failed, please try again later.",
       success: false,
@@ -96,6 +99,7 @@ export async function login(
     const { password: hashedPassword, userId } = result.rows[0];
 
     const isPasswordCorrect = await bcrypt.compare(password, hashedPassword);
+    console.log(isPasswordCorrect);
 
     await createSession(userId);
     return { message: "Successfully logged in.", success: true };
