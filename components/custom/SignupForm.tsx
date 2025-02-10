@@ -60,7 +60,7 @@ export default function SignupForm() {
       // alert("Success state captured");
       router.push("/login");
     }
-  }, [state]);
+  }, [state, router]);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
