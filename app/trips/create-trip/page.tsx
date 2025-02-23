@@ -34,10 +34,10 @@ const formSchema = z
     location: z.string().min(2, {
       message: 'Trip location must be at least 2 characters'
     }),
-    date: z.date(),
+    date: z.date().transform((val) => val.toISOString()),
     passengers: z.string()
   })
-  .refine((val) => val.date < new Date(), {
+  .refine((val) => val.date < new Date().toISOString(), {
     message: 'Invalid date'
   });
 
@@ -57,7 +57,7 @@ export default function CreateTrip() {
     defaultValues: {
       name: '',
       location: '',
-      date: new Date(),
+      // date: new Date().toISOString(),
       passengers: ''
     }
   });
@@ -110,12 +110,20 @@ export default function CreateTrip() {
 
               <FormField
                 control={form.control}
-                name='passengers'
+                name='date'
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormLabel>Passengers</FormLabel>
                     <FormControl>
-                      <Input type='date'  />
+                      <Input
+                        type='date'
+                        min={
+                          new Date(new Date().setDate(new Date().getDate() + 7))
+                            .toISOString()
+                            .split('T')[0]
+                        }
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -138,6 +146,7 @@ export default function CreateTrip() {
 
               <Button type='submit'>Submit</Button>
             </form>
+            <p>{state.message}</p>
           </Form>
         </CardContent>
         <CardFooter className='flex justify-between'>

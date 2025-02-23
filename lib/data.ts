@@ -121,6 +121,7 @@ export async function createTrip(
     const { payload } = await checkSession();
     const userId = payload?.userId as string;
     const tripDate = formData.get('date') as string;
+    // console.log(tripDate);
     const validationResult = await sql`
     WITH existing_trip AS (
       SELECT 1 
@@ -136,12 +137,16 @@ export async function createTrip(
       END AS validation_status
     `;
     const { validation_status } = validationResult.rows[0];
-    if (validation_status !== 'valid')
+    // console.log(validation_status);
+    if (validation_status !== 'valid') {
+      console.log(validation_status);
       return {
-        message:
-          'Trip must be at least 7 days in advance or trip with same date or next day already exists.',
+        message: validation_status,
         success: false
       };
+    } else {
+      console.log('Validation ok');
+    }
 
     // 3. Create trip request
     const tripName = formData.get('name') as string;
@@ -149,19 +154,19 @@ export async function createTrip(
     const maxPassengers = formData.get('passengers') as string;
     formData.get('location');
 
-    // const createTripResult = await sql`
-    //   INSERT INTO trip_requests (trip_name, created_by, trip_date, trip_location, max_passengers, 
-    //   passengers_names, no_of_passengers)
-    //   VALUES (${tripName}, ${userId}, ${tripDate}, ${tripLocation}, ${maxPassengers}, ARRAY[${userId}], 1)
-    //   RETURNING trip_name
-    //   `;
-    // console.log(createTripResult);
-    console.log(tripDate);
+    const createTripResult = await sql`
+      INSERT INTO trip_requests (trip_name, created_by, trip_date, trip_location, max_passengers, 
+      passengers_names, no_of_passengers)
+      VALUES (${tripName}, ${userId}, ${tripDate}, ${tripLocation}, ${maxPassengers}, ARRAY[${userId}], 1)
+      RETURNING trip_name
+      `;
+    console.log(createTripResult);
+
     // console.log(validationResult);
   } catch (error) {
     console.log(error);
   }
 
-  console.log(formData);
-  return { message: 'Test', success: true };
+  // console.log(formData);
+  return { message: 'Trip request was created successfully', success: true };
 }
