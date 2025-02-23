@@ -113,14 +113,15 @@ export async function createTrip(
 ) {
   // 1. Check if logged in
   // add this in route middleware route instead of checking again
+
   // 2. Run create trip query
   try {
-    // Check if user alreadt created another trip on the same date
-    // check if user and date selected exists
+    // 2a. Check if user alreadt created another trip on the same date
+    // (check if user and date selected exists)
     const { payload } = await checkSession();
     const userId = payload?.userId as string;
     const tripDate = formData.get('date') as string;
-    const result = await sql`
+    const validationResult = await sql`
     WITH existing_trip AS (
       SELECT 1 
       FROM trip_requests WHERE created_by=${userId} AND
@@ -134,7 +135,29 @@ export async function createTrip(
         ELSE 'valid'
       END AS validation_status
     `;
-    console.log(result);
+    const { validation_status } = validationResult.rows[0];
+    if (validation_status !== 'valid')
+      return {
+        message:
+          'Trip must be at least 7 days in advance or trip with same date or next day already exists.',
+        success: false
+      };
+
+    // 3. Create trip request
+    const tripName = formData.get('name') as string;
+    const tripLocation = formData.get('location') as string;
+    const maxPassengers = formData.get('passengers') as string;
+    formData.get('location');
+
+    // const createTripResult = await sql`
+    //   INSERT INTO trip_requests (trip_name, created_by, trip_date, trip_location, max_passengers, 
+    //   passengers_names, no_of_passengers)
+    //   VALUES (${tripName}, ${userId}, ${tripDate}, ${tripLocation}, ${maxPassengers}, ARRAY[${userId}], 1)
+    //   RETURNING trip_name
+    //   `;
+    // console.log(createTripResult);
+    console.log(tripDate);
+    // console.log(validationResult);
   } catch (error) {
     console.log(error);
   }
