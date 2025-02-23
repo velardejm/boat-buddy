@@ -1,0 +1,165 @@
+1. Creating the trip_requests Table:
+
+
+CREATE TABLE trip_requests (
+    tripId SERIAL PRIMARY KEY,
+    trip_name VARCHAR(255),
+    created_by VARCHAR(255),
+    trip_date DATE,
+    trip_location VARCHAR(255),
+    max_passengers INT,
+    passengers_names TEXT[],  -- array of names of passengers
+    no_of_passengers INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+Here, the tripId is automatically generated using the SERIAL data type, and the passengers_names column is an array to store names of the passengers.
+
+
+3. Adding Constraints and Inserting the Trip
+
+-- First, we check if the trip's conditions are valid
+
+WITH existing_trip AS (
+    SELECT 1
+    FROM trip_requests
+    WHERE (trip_date = $1 OR trip_date = $1 + INTERVAL '1 day')
+    LIMIT 1
+)
+SELECT
+    CASE
+        WHEN EXISTS (SELECT 1 FROM existing_trip) THEN 'Error: Trip with same date or next day already exists.'
+        WHEN $1 < CURRENT_DATE + INTERVAL '7 days' THEN 'Error: Trip must be at least 7 days in advance.'
+        ELSE 'Valid'
+    END AS validation_status;
+
+
+4. Inserting the New Trip Request:
+
+-- Insert the new trip request
+INSERT INTO trip_requests (
+    trip_name, created_by, trip_date, trip_location, max_passengers, passengers_names, no_of_passengers
+)
+VALUES (
+    $2,    -- trip_name
+    $3,    -- created_by
+    $1,    -- trip_date (date of trip)
+    $4,    -- trip_location
+    $5,    -- max_passengers
+    $6,    -- passengers_names (array of names)
+    $7     -- no_of_passengers
+);
+
+
+5. Putting it Together:
+
+-- Check if the trip date is valid
+WITH existing_trip AS (
+    SELECT 1
+    FROM trip_requests
+    WHERE (trip_date = $1 OR trip_date = $1 + INTERVAL '1 day')
+    LIMIT 1
+)
+SELECT
+    CASE
+        WHEN EXISTS (SELECT 1 FROM existing_trip) THEN 'Error: Trip with same date or next day already exists.'
+        WHEN $1 < CURRENT_DATE + INTERVAL '7 days' THEN 'Error: Trip must be at least 7 days in advance.'
+        ELSE 'Valid'
+    END AS validation_status;
+
+-- If valid, insert the trip request
+INSERT INTO trip_requests (
+    trip_name, created_by, trip_date, trip_location, max_passengers, passengers_names, no_of_passengers
+)
+VALUES (
+    'Sample Trip',  -- Example data
+    'User123',
+    '2025-03-01',
+    'New York',
+    5,
+    ARRAY['Alice', 'Bob', 'Charlie'],
+    3
+);
+
+
+
+
+
+6. Using Triggers (Optional)
+
+1. Create the Trigger Function
+We need a trigger function that will check the conditions before inserting a new record into the trip_requests table.
+
+CREATE OR REPLACE FUNCTION check_trip_constraints()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if a trip with the same date or next day exists
+    IF EXISTS (
+        SELECT 1
+        FROM trip_requests
+        WHERE trip_date = NEW.trip_date OR trip_date = NEW.trip_date + INTERVAL '1 day'
+    ) THEN
+        RAISE EXCEPTION 'Error: A trip with the same date or next day already exists.';
+    END IF;
+
+    -- Check if the trip is less than 7 days from the current date
+    IF NEW.trip_date < CURRENT_DATE + INTERVAL '7 days' THEN
+        RAISE EXCEPTION 'Error: The trip must be at least 7 days in advance.';
+    END IF;
+
+    -- If no errors, allow the insert
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+2. Create the Trigger
+Once the trigger function is defined, we create a trigger that will call this function before any insert operation on the trip_requests table.
+
+CREATE TRIGGER trip_request_before_insert
+BEFORE INSERT ON trip_requests
+FOR EACH ROW
+EXECUTE FUNCTION check_trip_constraints();
+
+
+Explanation:
+Trigger Function (check_trip_constraints):
+
+It checks if a trip already exists on the same date or one day after the new trip's date.
+It checks if the trip date is less than 7 days from the current date. If so, it raises an error.
+If both conditions are passed, it allows the insert to proceed.
+Trigger (trip_request_before_insert):
+
+The trigger is fired before an insert operation on the trip_requests table.
+It executes the check_trip_constraints function for each row being inserted.
+
+
+3. Example Insertion
+
+INSERT INTO trip_requests (
+    trip_name, created_by, trip_date, trip_location, max_passengers, passengers_names, no_of_passengers
+)
+VALUES (
+    'Sample Trip',  -- trip_name
+    'User123',      -- created_by
+    '2025-03-01',   -- trip_date
+    'New York',     -- trip_location
+    5,              -- max_passengers
+    ARRAY['Alice', 'Bob', 'Charlie'],  -- passengers_names (array of names)
+    3               -- no_of_passengers
+);
+
+Error Handling
+If you try to insert a trip that violates the constraints (e.g., a trip with the same date or within 7 days), you will get the following error messages:
+
+"Error: A trip with the same date or next day already exists."
+"Error: The trip must be at least 7 days in advance."
+These errors will prevent the insert from happening if the conditions are not met.
+
+
+4. Drop Trigger and Function (if needed)
+
+If you ever need to remove the trigger or function, you can use:
+
+DROP TRIGGER trip_request_before_insert ON trip_requests;
+DROP FUNCTION check_trip_constraints();

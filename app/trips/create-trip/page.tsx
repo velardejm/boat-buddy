@@ -1,17 +1,19 @@
-"use client";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import DatePicker from "@/components/custom/DatePicker";
+'use client';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useActionState } from 'react';
+import { createTrip } from '@/lib/data';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import DatePicker from '@/components/custom/DatePicker';
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  CardTitle
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -19,35 +21,45 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+  FormMessage
+} from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
 
 const formSchema = z
   .object({
     name: z.string().min(2, {
-      message: "Trip name must be at least 2 characters",
+      message: 'Trip name must be at least 2 characters'
     }),
 
     location: z.string().min(2, {
-      message: "Trip location must be at least 2 characters",
+      message: 'Trip location must be at least 2 characters'
     }),
     date: z.date(),
-    passengers: z.string(),
+    passengers: z.string()
   })
   .refine((val) => val.date < new Date(), {
-    message: "Invalid date",
+    message: 'Invalid date'
   });
 
 export default function CreateTrip() {
+  const [state, formAction, pending] = useActionState<
+    { message: string; success: boolean },
+    FormData
+  >(createTrip, { message: '', success: false });
+
+  // const [state, formAction, pending] = useActionState<
+  //   { message: string; success: boolean },
+  //   FormData
+  // >(addUser, { message: '', success: false });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      location: "",
+      name: '',
+      location: '',
       date: new Date(),
-      passengers: "",
-    },
+      passengers: ''
+    }
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -55,28 +67,27 @@ export default function CreateTrip() {
   }
 
   return (
-    <div className="flex justify-center">
-      <Card className="w-[350px]">
+    <div className='flex justify-center'>
+      <Card className='w-[350px]'>
         <CardHeader>
           <CardTitle>Organize a Fishing Trip</CardTitle>
-          <CardDescription>
-            Set up your fishing trip and invite others to join!
-          </CardDescription>
+          <CardDescription>Set up your fishing trip and invite others to join!</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6 flex flex-col  items-center h-1/2"
+              action={formAction}
+              // onSubmit={form.handleSubmit(onSubmit)}
+              className='space-y-6 flex flex-col  items-center h-1/2'
             >
               <FormField
                 control={form.control}
-                name="name"
+                name='name'
                 render={({ field }) => (
-                  <FormItem className="w-full">
+                  <FormItem className='w-full'>
                     <FormLabel>Trip Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Fishing trip name" {...field} />
+                      <Input placeholder='Fishing trip name' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -85,15 +96,12 @@ export default function CreateTrip() {
 
               <FormField
                 control={form.control}
-                name="location"
+                name='location'
                 render={({ field }) => (
-                  <FormItem className="w-full">
+                  <FormItem className='w-full'>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Where do you want to go fishing?"
-                        {...field}
-                      />
+                      <Input placeholder='Where do you want to go fishing?' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -102,40 +110,37 @@ export default function CreateTrip() {
 
               <FormField
                 control={form.control}
-                name="date"
+                name='passengers'
                 render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Date</FormLabel>
-                    <FormControl>
-                      <DatePicker
-                        value={field.value || null}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="passengers"
-                render={({ field }) => (
-                  <FormItem className="w-full">
+                  <FormItem className='w-full'>
                     <FormLabel>Passengers</FormLabel>
                     <FormControl>
-                      <Input type="number" min="1" max="6" {...field} />
+                      <Input type='date'  />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit">Submit</Button>
+              <FormField
+                control={form.control}
+                name='passengers'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>Passengers</FormLabel>
+                    <FormControl>
+                      <Input type='number' min='1' max='6' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type='submit'>Submit</Button>
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className='flex justify-between'>
           {/* <Button variant="outline">Cancel</Button>
         <Button>Send Request</Button> */}
         </CardFooter>

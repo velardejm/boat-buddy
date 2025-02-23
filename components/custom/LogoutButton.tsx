@@ -13,7 +13,7 @@ export default function LogoutButton({
   const router = useRouter();
 
   const logOut = async () => {
-    router.push("/");
+    router.push("/login");
     await deleteSession();
   };
 
