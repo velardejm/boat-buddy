@@ -34,7 +34,14 @@ const formSchema = z
     location: z.string().min(2, {
       message: 'Trip location must be at least 2 characters'
     }),
-    date: z.date().transform((val) => val.toISOString()),
+    // date: z.date().transform((val) => val.toISOString()),
+    date: z
+      .string()
+      .transform((val) => {
+        // console.log(val);
+        return new Date(val);
+      })
+      .transform((val) => val.toISOString()),
     passengers: z.string()
   })
   .refine((val) => val.date < new Date().toISOString(), {
@@ -60,6 +67,13 @@ export default function CreateTrip() {
       // date: new Date().toISOString(),
       passengers: ''
     }
+  });
+
+  const parse = formSchema.safeParse({
+    name: form.getValues('name'),
+    location: form.getValues('location'),
+    date: form.getValues('date'),
+    passengers: form.getValues('passengers')
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -112,7 +126,14 @@ export default function CreateTrip() {
                 control={form.control}
                 name='date'
                 render={({ field }) => (
-                  <FormItem className='w-full'>
+                  <FormItem
+                    className='w-full'
+                    onChange={() => {
+                      form.trigger('date');
+                      console.log(parse.error);
+                      console.log(parse.success);
+                    }}
+                  >
                     <FormLabel>Passengers</FormLabel>
                     <FormControl>
                       <Input
