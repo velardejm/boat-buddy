@@ -75,7 +75,7 @@ export default function LoginForm() {
           control={form.control}
           name='username'
           render={({ field }) => (
-            <FormItem className='w-full' onChange={() => form.trigger('username')}>
+            <FormItem className='w-full'>
               {/* <FormLabel>Username</FormLabel> */}
               <FormControl>
                 <Input placeholder='Username' {...field} />

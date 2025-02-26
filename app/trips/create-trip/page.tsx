@@ -1,11 +1,11 @@
 'use client';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { createTrip } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import DatePicker from '@/components/custom/DatePicker';
+// import DatePicker from '@/components/custom/DatePicker';
 import {
   Card,
   CardContent,
@@ -25,28 +25,27 @@ import {
 } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 
-const formSchema = z
-  .object({
-    name: z.string().min(2, {
-      message: 'Trip name must be at least 2 characters'
-    }),
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: 'Trip name must be at least 2 characters'
+  }),
 
-    location: z.string().min(2, {
-      message: 'Trip location must be at least 2 characters'
-    }),
-    // date: z.date().transform((val) => val.toISOString()),
-    date: z
-      .string()
-      .transform((val) => {
-        // console.log(val);
-        return new Date(val);
-      })
-      .transform((val) => val.toISOString()),
-    passengers: z.string()
-  })
-  .refine((val) => val.date < new Date().toISOString(), {
-    message: 'Invalid date'
-  });
+  location: z.string().min(2, {
+    message: 'Trip location must be at least 2 characters'
+  }),
+  // date: z.date().transform((val) => val.toISOString()),
+  date: z.string().date(),
+  // .transform((val) => {
+  //   // console.log(val);
+  //   return new Date(val);
+  // })
+  // .transform((val) => val.toISOString()),
+  // passengers: z.string().transform((val) => Number(val))
+  passengers: z.string().min(1)
+});
+// .refine((val) => val.date < new Date().toISOString(), {
+//   message: 'Invalid date'
+// });
 
 export default function CreateTrip() {
   const [state, formAction, pending] = useActionState<
@@ -64,7 +63,7 @@ export default function CreateTrip() {
     defaultValues: {
       name: '',
       location: '',
-      // date: new Date().toISOString(),
+      date: new Date().toISOString(),
       passengers: ''
     }
   });
@@ -76,9 +75,15 @@ export default function CreateTrip() {
     passengers: form.getValues('passengers')
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  // function onSubmit(values: z.infer<typeof formSchema>) {
+  //   console.log(values);
+  // }
+
+  useEffect(() => {
+    if (state.success) {
+      form.reset();
+    }
+  }, [state]);
 
   return (
     <div className='flex justify-center'>
@@ -122,19 +127,35 @@ export default function CreateTrip() {
                 )}
               />
 
+              {/* Original Date Form Field */}
+              {/* <FormField
+                control={form.control}
+                name='date'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>Trip Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='date'
+                        min={
+                          new Date(new Date().setDate(new Date().getDate() + 7))
+                            .toISOString()
+                            .split('T')[0]
+                        }
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              /> */}
+
               <FormField
                 control={form.control}
                 name='date'
                 render={({ field }) => (
-                  <FormItem
-                    className='w-full'
-                    onChange={() => {
-                      form.trigger('date');
-                      console.log(parse.error);
-                      console.log(parse.success);
-                    }}
-                  >
-                    <FormLabel>Passengers</FormLabel>
+                  <FormItem className='w-full'>
+                    <FormLabel>Trip Date</FormLabel>
                     <FormControl>
                       <Input
                         type='date'
@@ -156,16 +177,24 @@ export default function CreateTrip() {
                 name='passengers'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Passengers</FormLabel>
+                    <FormLabel>Max Passengers</FormLabel>
                     <FormControl>
-                      <Input type='number' min='1' max='6' {...field} />
+                      <Input
+                        type='number'
+                        min='2'
+                        max='6'
+                        {...field}
+                        placeholder='Min = 2 | Max = 6'
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type='submit'>Submit</Button>
+              <Button type='submit' disabled={!parse.success}>
+                Submit
+              </Button>
             </form>
             <p>{state.message}</p>
           </Form>
