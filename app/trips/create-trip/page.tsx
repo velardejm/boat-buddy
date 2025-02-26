@@ -34,7 +34,7 @@ const formSchema = z.object({
     message: 'Trip location must be at least 2 characters'
   }),
   // date: z.date().transform((val) => val.toISOString()),
-  date: z.string().date(),
+  date: z.string(),
   // .transform((val) => {
   //   // console.log(val);
   //   return new Date(val);
@@ -76,6 +76,11 @@ export default function CreateTrip() {
     passengers: form.getValues('passengers')
   });
 
+  const selectDate = (date: Date) => {
+    form.setValue('date', date ? date.toISOString() : '');
+    console.log('Date: ' + form.getValues('date'));
+  };
+
   // function onSubmit(values: z.infer<typeof formSchema>) {
   //   console.log(values);
   // }
@@ -106,7 +111,11 @@ export default function CreateTrip() {
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormLabel>Trip Name</FormLabel>
-                    <FormControl>
+                    <FormControl
+                      onChange={() => {
+                        console.log(parse.error);
+                      }}
+                    >
                       <Input placeholder='Fishing trip name' {...field} />
                     </FormControl>
                     <FormMessage />
@@ -158,7 +167,7 @@ export default function CreateTrip() {
                   <FormItem className='w-full'>
                     <FormLabel>Trip Date</FormLabel>
                     <FormControl>
-                      <Input
+                      {/* <Input
                         type='date'
                         min={
                           new Date(new Date().setDate(new Date().getDate() + 7))
@@ -166,13 +175,8 @@ export default function CreateTrip() {
                             .split('T')[0]
                         }
                         {...field}
-                      />
-                      {/* <Input
-                        placeholder='This works?'
-                        className='hidden'
-                        {...field}
-                        value={date?.toDateString()}
                       /> */}
+                      <Input className='hidden' {...field} value={date?.toDateString()} />
                       {/* <Input placeholder='This works?' {...field} value={date?.toDateString()} /> */}
                     </FormControl>
                     <FormMessage />
@@ -184,8 +188,8 @@ export default function CreateTrip() {
                 <DatePicker
                   date={date}
                   setDate={setDate}
-                  onChange={() => {
-                    form.setValue('date', date ? date?.toISOString() : '');
+                  selectDate={(date) => {
+                    selectDate(date);
                   }}
                 />
               </div>
