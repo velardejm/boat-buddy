@@ -1,11 +1,11 @@
 'use client';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { createTrip } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-// import DatePicker from '@/components/custom/DatePicker';
+import DatePicker from '@/components/custom/DatePicker';
 import {
   Card,
   CardContent,
@@ -48,6 +48,7 @@ const formSchema = z.object({
 // });
 
 export default function CreateTrip() {
+  const [date, setDate] = useState<Date>();
   const [state, formAction, pending] = useActionState<
     { message: string; success: boolean },
     FormData
@@ -166,11 +167,28 @@ export default function CreateTrip() {
                         }
                         {...field}
                       />
+                      {/* <Input
+                        placeholder='This works?'
+                        className='hidden'
+                        {...field}
+                        value={date?.toDateString()}
+                      /> */}
+                      {/* <Input placeholder='This works?' {...field} value={date?.toDateString()} /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <div>
+                <DatePicker
+                  date={date}
+                  setDate={setDate}
+                  onChange={() => {
+                    form.setValue('date', date ? date?.toISOString() : '');
+                  }}
+                />
+              </div>
 
               <FormField
                 control={form.control}
