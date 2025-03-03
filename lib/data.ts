@@ -92,6 +92,27 @@ export async function getTrips() {
   }
 }
 
+// lib/data.ts
+
+export async function getTripDetails(tripid: string) {
+  try {
+    // Replace this with the actual SQL query to fetch trip details by tripid
+    const result = await sql`
+      SELECT * FROM trip_requests WHERE tripid = ${tripid}
+    `;
+
+    if (result.rows.length === 0) {
+      return null; // Trip not found
+    }
+
+    // Return the trip details
+    return result.rows[0];
+  } catch (error) {
+    console.error(error);
+    return null; // In case of an error, return null
+  }
+}
+
 // 'use server';
 
 // import { sql } from '@vercel/postgres';
