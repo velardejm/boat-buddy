@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Table,
   TableBody,
@@ -57,7 +58,8 @@ export default function TripsTable() {
             <TableCell>{new Date(trip.trip_date.toString()).toISOString().split('T')[0]}</TableCell>
             <TableCell>{`${trip.no_of_passengers} / 6`}</TableCell>
             <TableCell>
-              <Button variant='secondary'>View details</Button>
+              {/* <Button variant='secondary'>View details</Button> */}
+              <Link href={`/trips/details/${trip.tripid}`}>Details</Link>
             </TableCell>
           </TableRow>
         ))}
