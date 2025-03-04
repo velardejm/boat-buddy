@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import CommentsSection from '@/components/custom/CommentsSection';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import JoinTripButton from '@/components/custom/JoinTrip';
 
 type TripDetailsProps = {
   params: { tripid: string };
@@ -13,7 +14,7 @@ const TripDetails = async ({ params }: TripDetailsProps) => {
 
   // Fetch trip data using the function from 'data.ts'
   const trip = await getTripDetails(tripid);
-  console.log(trip);
+  // console.log(trip);
 
   if (!trip) {
     notFound(); // Trigger a 404 if the trip is not found
@@ -37,7 +38,8 @@ const TripDetails = async ({ params }: TripDetailsProps) => {
               <strong>Passengers:</strong> {trip.no_of_passengers}
             </p>
           </div>
-          <Button>Join Trip</Button>
+          {/* <Button>Join Trip</Button> */}
+          <JoinTripButton />
         </CardContent>
       </Card>
       {/* Include the comments section */}
