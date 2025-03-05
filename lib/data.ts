@@ -3,6 +3,7 @@
 import { sql } from '@vercel/postgres';
 import bcrypt from 'bcrypt';
 import { checkSession, createSession } from './session';
+import { boolean } from 'zod';
 
 interface PrevState {
   message: string;
@@ -115,7 +116,7 @@ export async function getTripDetails(tripid: string) {
   }
 }
 
-export async function joinTrip() {
+export async function joinTrip(tripId: string) {
   try {
     const session = await checkSession();
     if (!session.payload) {
@@ -125,34 +126,46 @@ export async function joinTrip() {
     const usernameResult = await sql`
     SELECT username FROM users WHERE userid=${userId}
     `;
-    console.log(usernameResult.rows[0]);
+    const username = usernameResult.rows[0].username;
 
-    // const { tripid } = session.payload;
-    // const tripId = tripid as string;
     const trip = await getTripDetails(tripId);
     console.log(trip);
 
-    // if (!trip) {
-    //   return { message: 'Trip not found.', success: false };
-    // }
+    if (!trip) {
+      return { message: 'Trip not found.', success: false };
+    }
 
-    // if (trip.passengers_names.includes(username)) {
-    //   return { message: 'You have already joined this trip.', success: false };
-    // }
+    if (trip.passengers_names.includes(username)) {
+      return { message: 'You have already joined this trip.', success: false };
+    }
 
-    // if (trip.no_of_passengers >= trip.max_passengers) {
-    //   return { message: 'This trip is already full.', success: false };
-    // }
+    if (trip.no_of_passengers >= trip.max_passengers) {
+      return { message: 'This trip is already full.', success: false };
+    }
 
-    // await sql`;
-    //   UPDATE trip_requests
-    //   SET no_of_passengers = no_of_passengers + 1,
-    //       passengers_names = array_append(passengers_names, ${username})
-    //   WHERE tripid = ${tripId}
-    // `;
+    await sql`;
+      UPDATE trip_requests
+      SET no_of_passengers = no_of_passengers + 1,
+          passengers_names = array_append(passengers_names, ${username})
+      WHERE tripid = ${tripId}
+    `;
     return { message: 'Successfully joined the trip.', success: true };
   } catch (error) {
     console.error(error);
     return { message: 'Failed to join the trip.', success: false };
+  }
+}
+
+export async function getUsername(userId: string): Promise<{ message: string; success: boolean }> {
+  try {
+    const usernameResult = await sql`
+  SELECT username FROM users WHERE userid=${userId}
+  `;
+    // console.log(usernameResult);
+    // if (usernameResult.rowCount && usernameResult.rowCount > 0)
+    return { message: usernameResult.rows[0].username, success: true };
+  } catch (error) {
+    console.log(error);
+    return { message: 'User not found', success: false };
   }
 }

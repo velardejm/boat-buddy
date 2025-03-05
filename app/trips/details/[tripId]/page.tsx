@@ -1,24 +1,31 @@
-import { getTripDetails } from '@/lib/data';
+import { getTripDetails, getUsername } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import CommentsSection from '@/components/custom/CommentsSection';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import JoinTripButton from '@/components/custom/JoinTrip';
+import JoinTripButton from '@/components/custom/JoinTripButton';
+import BackoutButton from '@/components/custom/BackoutButton';
+import { Separator } from '@/components/ui/separator';
+import { checkSession } from '@/lib/session';
 
 type TripDetailsProps = {
   params: { tripid: string };
 };
 
 const TripDetails = async ({ params }: TripDetailsProps) => {
-  const { tripid } = params;
-
+  const { tripid } = await params;
   // Fetch trip data using the function from 'data.ts'
   const trip = await getTripDetails(tripid);
-  // console.log(trip);
+  const passengers: string[] = trip?.passengers_names ? trip.passengers_names : [];
+  // console.log(trip.passengers_names);
 
   if (!trip) {
     notFound(); // Trigger a 404 if the trip is not found
   }
+
+  const session = await checkSession();
+  const { message: username } = await getUsername(session.payload?.userId as string);
+  // console.log(typeof passengers);
+  const isAlreadyJoined = passengers.includes(username);
 
   return (
     <div className='max-w-3xl container mx-auto px-4 py-8 space-y-8'>
@@ -39,189 +46,35 @@ const TripDetails = async ({ params }: TripDetailsProps) => {
             </p>
           </div>
           {/* <Button>Join Trip</Button> */}
-          <JoinTripButton />
+          <div>
+            <JoinTripButton
+              tripId={(await params).tripid}
+              className='mb-2'
+              disabled={isAlreadyJoined}
+            />
+            <BackoutButton className={`${isAlreadyJoined ? '' : 'hidden'}`} />
+          </div>
         </CardContent>
       </Card>
       {/* Include the comments section */}
+      <Separator className='my-4' />
+      <div>
+        <h3 className='text-lg font-semibold'>Passenger List:</h3>
+        {passengers && trip.passengers_names.length > 0 ? (
+          <ul className='mt-2'>
+            {trip.passengers_names.map((passenger: string, index: number) => (
+              <li key={index} className='py-1'>
+                {passenger}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className='text-gray-500'>No passengers yet.</p>
+        )}
+      </div>
       <CommentsSection />
     </div>
   );
 };
 
 export default TripDetails;
-
-// import { getTripDetails } from '@/lib/data';
-// import { notFound } from 'next/navigation';
-// import dynamic from 'next/dynamic';
-// import CommentsSection from '@/components/custom/CommentsSection';
-
-// type TripDetailsProps = {
-//   params: { tripid: string };
-// };
-
-// // const CommentsSection = dynamic(() => import('@/components/custom/CommentsSection'), {
-// //   ssr: false
-// // });
-
-// const TripDetails = async ({ params }: TripDetailsProps) => {
-//   const { tripid } = params;
-
-//   // Fetch trip data using the function from 'data.ts'
-//   const trip = await getTripDetails(tripid);
-//   console.log(trip);
-
-//   if (!trip) {
-//     notFound(); // Trigger a 404 if the trip is not found
-//   }
-
-//   return (
-//     <div>
-//       <h1 className='text-3xl font-bold mb-4'>Trip Details: {trip.trip_name}</h1>
-//       <p>
-//         <strong>Location:</strong> {trip.trip_location}
-//       </p>
-//       <p>
-//         <strong>Date:</strong> {trip.trip_date.toISOString().split('T')[0]}
-//       </p>
-//       <p>
-//         <strong>Passengers:</strong> {trip.no_of_passengers}
-//       </p>
-//       {/* Include the comments section */}
-//       <CommentsSection />
-//     </div>
-//   );
-// };
-
-// export default TripDetails;
-
-// // app/trips/details/[tripid]/page.tsx
-// import { getTripDetails } from '@/lib/data';
-// import { notFound } from 'next/navigation';
-
-// type TripDetailsProps = {
-//   params: { tripid: string };
-// };
-
-// const TripDetails = async ({ params }: TripDetailsProps) => {
-//   const { tripid } = params;
-
-//   // Fetch trip data using the function from 'data.ts'
-//   const trip = await getTripDetails(tripid);
-//   console.log(trip);
-
-//   if (!trip) {
-//     notFound(); // This will trigger a 404 page if the trip is not found
-//   }
-
-//   return (
-//     <div>
-//       <h1>Trip Details: {trip.trip_name}</h1>
-//       <p>
-//         <strong>Location:</strong> {trip.trip_location}
-//       </p>
-//       <p>
-//         <strong>Date:</strong> {trip.trip_date.toISOString().split('T')[0]}
-//       </p>
-//       <p>
-//         <strong>Passengers:</strong> {trip.no_of_passengers}
-//       </p>
-//     </div>
-//   );
-// };
-
-// export default TripDetails;
-
-// // import * as React from "react";
-
-// // import { Button } from "@/components/ui/button";
-// // import {
-// //   Card,
-// //   CardContent,
-// //   CardDescription,
-// //   CardFooter,
-// //   CardHeader,
-// //   CardTitle,
-// // } from "@/components/ui/card";
-// // import { Calendar as CalendarIcon, Users as UsersIcon } from "lucide-react";
-// // import { Input } from "@/components/ui/input";
-// // import { Label } from "@/components/ui/label";
-// // import { Textarea } from "@/components/ui/textarea";
-// // import CommentsList from "@/components/custom/CommentsLists";
-// // import { cn } from "@/lib/utils";
-// // import { format } from "date-fns";
-
-// // export default async function TripDetails({
-// //   params,
-// // }: {
-// //   params: Promise<{ tripId: string }>;
-// // }) {
-// //   const value = new Date(); //temporary value holder
-// //   const tripId = (await params).tripId;
-// //   return (
-// //     <div className="w-full flex flex-col items-center">
-// //       <p>Trip Id: {tripId}</p>
-// //       <Card className="flex flex-col pt-4 border-none">
-// //         <CardHeader className="w-[350px] self-center">
-// //           <CardTitle>Trip Details</CardTitle>
-// //           <CardDescription>
-// //             Are you interested to join this trip?
-// //           </CardDescription>
-// //         </CardHeader>
-// //         <CardContent className="w-[350px] self-center mb-8">
-// //           <form>
-// //             <div className="grid w-full items-center gap-4">
-// //               <div className="flex flex-col space-y-1.5">
-// //                 <Label htmlFor="name">Name</Label>
-// //                 <Input id="name" disabled={true} value={"Trip Name"} />
-// //               </div>
-// //               <div className="flex flex-col space-y-1.5">
-// //                 <Label htmlFor="name">Location</Label>
-// //                 <Input id="location" disabled={true} value={"Trip Location"} />
-// //               </div>
-// //               <div className="flex flex-col space-y-1.5">
-// //                 <Label htmlFor="name">Trip Date</Label>
-// //                 <Button
-// //                   disabled={true}
-// //                   variant={"outline"}
-// //                   className={cn(
-// //                     "justify-start text-left font-normal",
-// //                     !value && "text-muted-foreground"
-// //                   )}
-// //                 >
-// //                   <CalendarIcon className="mr-2 h-4 w-4" />
-// //                   {value ? format(value, "PPP") : <span>Pick a date</span>}
-// //                 </Button>
-// //               </div>
-// //               <div className="flex flex-col space-y-1.5">
-// //                 <Label htmlFor="name">Passengers</Label>
-// //                 <Button
-// //                   disabled={true}
-// //                   variant={"outline"}
-// //                   className={cn(
-// //                     "justify-start text-left font-normal",
-// //                     !value && "text-muted-foreground"
-// //                   )}
-// //                 >
-// //                   <UsersIcon className="mr-2 h-4 w-4" />
-// //                   {/* {value ? format(value, "PPP") : <span>Pick a date</span>}
-// //                    */}
-// //                   <p className="grow text-center">{`1 / 6`}</p>
-// //                 </Button>
-// //               </div>
-// //             </div>
-// //           </form>
-// //           <div className="mt-8 flex justify-center">
-// //             <Button variant="outline" className="first:mr-8">
-// //               Cancel
-// //             </Button>
-// //             <Button>Join</Button>
-// //           </div>
-// //         </CardContent>
-// //         <CardFooter className="flex flex-col justify-between">
-// //           <Textarea placeholder="Write your comment here..." />
-// //           <CommentsList />
-// //         </CardFooter>
-// //       </Card>
-// //     </div>
-// //   );
-// // }
