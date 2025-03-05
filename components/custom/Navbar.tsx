@@ -35,11 +35,6 @@ export default async function Navbar() {
               Available Trips
             </NavigationMenuLink>
           </Link>
-          <Link href='/trips/details/abc' legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Trip Details
-            </NavigationMenuLink>
-          </Link>
         </NavigationMenuItem>
       </NavigationMenuList>
       <NavigationMenuList>
